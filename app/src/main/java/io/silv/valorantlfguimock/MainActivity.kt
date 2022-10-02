@@ -2,6 +2,8 @@ package io.silv.valorantlfguimock
 
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -29,6 +32,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContent {
             ValorantLfgUiMockTheme {
                 BottomSheetScaffold(
@@ -39,10 +45,15 @@ class MainActivity : ComponentActivity() {
                             .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                             .background(LocalCustomColors.current.sidebarBackground)
                         ) {
+                            Text(
+                                text = "Dark",
+                                Modifier.clickable {
 
+                                }
+                            )
                         }
                     },
-                    sheetPeekHeight = 25.dp
+                    sheetPeekHeight = 45.dp
                 ) {
                     Navigation()
                 }
