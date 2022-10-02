@@ -21,22 +21,13 @@ private val DarkColorScheme = darkColors(
     surface = slate900,
 )
 
-@Immutable
-data class CustomColors(
-    val primary: Color = Color(0xff2185d0),
-    val windowBackground: Color = Color(0xfff0f0f0),
-    val background: Color = Color(0xfff5f5f4),
-    val foreground: Color = paper900,
-    val sidebarBackground: Color = navy20,
-    val sidebarForeground: Color = navy900,
-    val sidebarSeparator: Color = paper00,
-    val headerBarBackground: Color = paper20,
-)
 
-val customColors = CustomColors()
 
-val LocalCustomColors = staticCompositionLocalOf {
-    CustomColors()
+
+
+
+val LocalCustomColors = compositionLocalOf<CustomColors> {
+    CustomColorsLight()
 }
 
 private val LightColorScheme = lightColors(
@@ -59,8 +50,15 @@ fun ValorantLfgUiMockTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
+    currentTheme: Theme = Theme.Light,
+    changeTheme: (Theme) -> Unit = {},
     content: @Composable () -> Unit
 ) {
+    val customColor = when(currentTheme) {
+        is Theme.Light -> CustomColorsLight()
+        is Theme.Dark -> CustomColorsDark()
+        else -> CustomColorsLight()
+    }
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -76,7 +74,9 @@ fun ValorantLfgUiMockTheme(
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
         }
     }
-    CompositionLocalProvider(LocalCustomColors.providesDefault(CustomColors())) {
+
+
+    CompositionLocalProvider(LocalCustomColors.provides(customColor)) {
         MaterialTheme(
             colors = colorScheme,
             typography = Typography,

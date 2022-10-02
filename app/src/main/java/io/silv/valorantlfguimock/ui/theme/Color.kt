@@ -1,5 +1,6 @@
 package io.silv.valorantlfguimock.ui.theme
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -27,3 +28,27 @@ val paper300 = Color(0xff767577)
 val paper900 = Color(0xff202020)
 val navy20 = Color(0xff171a21)
 val navy900 = Color(0xffb9babc)
+
+@Immutable
+data class CustomColorsLight (
+    override val primary: Color = Color(0xff2185d0),
+    override val windowBackground: Color = Color(0xfff0f0f0),
+    override val background: Color = Color(0xfff5f5f4),
+    override val foreground: Color = paper900,
+    override val sidebarBackground: Color = navy20,
+    override val sidebarForeground: Color = navy900,
+    override val sidebarSeparator: Color = paper00,
+    override val headerBarBackground: Color = paper20,
+) : CustomColors
+
+@Immutable
+data class CustomColorsDark  (
+    override val primary: Color = Color.Red,
+    override val windowBackground: Color =  Color.Red,
+    override val background: Color =  Color.Red,
+    override val foreground: Color =  Color.Red,
+    override val sidebarBackground: Color = navy20,
+    override val sidebarForeground: Color =Color.DarkGray,
+    override val sidebarSeparator: Color = Color.Red,
+    override val headerBarBackground: Color = Color.Red,
+) : CustomColors
