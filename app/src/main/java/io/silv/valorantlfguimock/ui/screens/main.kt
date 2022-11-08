@@ -23,3 +23,6 @@ fun MainScreen(
         NoteList(scrollState = scrollState, items = items)
     }
 }
+
+//@Composable
+//StickyHeaderLazyList

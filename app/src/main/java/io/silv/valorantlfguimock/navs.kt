@@ -19,6 +19,9 @@ import io.silv.valorantlfguimock.ui.atoms.Container
 import io.silv.valorantlfguimock.ui.components.*
 import io.silv.valorantlfguimock.ui.screens.MainScreen
 import io.silv.valorantlfguimock.ui.theme.LocalCustomColors
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -33,43 +36,37 @@ fun Home(paddingValues: PaddingValues) {
     val ANCHOR_INIT = 0f
     val (headerBarHeight, setHeaderBarHeight) = remember { mutableStateOf(50f) }
     val minY = -headerBarHeight
-    val maxY = 40f
-    val anchorY = remember {
-        mutableStateOf(ANCHOR_INIT)
-    }
-    var translationY by remember {
-        mutableStateOf(0f)
-    }
-    var progressY by remember {
-        mutableStateOf(0f)
-    }
+    val maxY = 50f
+    val anchorY = remember { mutableStateOf(ANCHOR_INIT) }
+    var translationY = remember { Animatable(0f) }
+    var progressY by remember { mutableStateOf(0f) }
+    var anim by remember { mutableStateOf(false) }
 
-
-    val interaction = scrollState.interactionSource.interactions.collectAsState(DragInteraction.Stop(DragInteraction.Start()))
-    if (interaction.value is DragInteraction.Stop || interaction.value is DragInteraction.Cancel) {
-        if(progressY > 0.5f || scrollState.value.toFloat() < headerBarHeight) {
-            Log.d("bar progY", "herer")
-            translationY = animateFloatAsState(
-                targetValue = maxY,
-                animationSpec = tween(delayMillis = 10000,easing = LinearOutSlowInEasing)
-            ).value
+    val coroutineScope = rememberCoroutineScope()
+   LaunchedEffect(!scrollState.isScrollInProgress) {
+       Log.d("bar", translationY.toString())
+       if(progressY > 0.5f || scrollState.value.toFloat() < headerBarHeight) {
+           Log.d("bar", "$translationY trans")
+           Log.d("bar", "$maxY tmax")
+           coroutineScope.launch {
+               translationY.animateTo(maxY)
+           }
         } else {
-            Log.d("bar progY", "hesdfasdfrer")
-            translationY = animateFloatAsState(
-                targetValue = minY,
-                animationSpec = tween(delayMillis = 10000,easing = LinearOutSlowInEasing)
-            ).value
+           Log.d("bar", "$translationY trans")
+           Log.d("bar", "$minY tmax")
+           coroutineScope.launch {
+               translationY.animateTo(minY)
+           }
         }
     }
     LaunchedEffect(key1 = scrollState.value) {
         val offsetY = scrollState.value.toFloat()
         var distY = offsetY - anchorY.value
         if (anchorY.value == ANCHOR_INIT) distY = offsetY
-        val value = if (offsetY <= -40f) maxY else maxOf(minY, minOf(maxY, translationY - distY))
-        translationY = value
+        val value = maxOf(minY, minOf(maxY, translationY.value - distY))
+        translationY.snapTo(value)
         anchorY.value = offsetY
-        progressY = lerp(minY.dp, maxY.dp, translationY).value
-        Log.d("bar ProgressY", translationY.toString())
+        progressY = lerp(minY.dp, maxY.dp, translationY.value).value
     }
 
     ModalDrawer(
@@ -90,7 +87,7 @@ fun Home(paddingValues: PaddingValues) {
                             )
                             HeaderBar(
                                 paddingValues = paddingValues,
-                                offset = translationY
+                                offset = translationY.asState().value
                             )
                         }
                     }
