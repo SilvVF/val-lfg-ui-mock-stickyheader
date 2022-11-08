@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import io.silv.valorantlfguimock.ui.theme.LocalCustomColors
 
@@ -17,20 +18,16 @@ import io.silv.valorantlfguimock.ui.theme.LocalCustomColors
 fun HeaderBar(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
-    visible: Boolean = true,
+    offset: Float,
     content: @Composable BoxScope.() -> Unit = {}
 ) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .padding(paddingValues.calculateTopPadding())
-                .background(Color.Transparent),
-            contentAlignment = Alignment.TopCenter
+   Box(
+       Modifier
+           .fillMaxWidth()
+           .padding(paddingValues.calculateTopPadding())
+           .offset(y = offset.dp)
+           .background(Color.Transparent),
+       contentAlignment = Alignment.TopCenter
         ) {
             val colors = LocalCustomColors.current
             Box(
@@ -57,5 +54,4 @@ fun HeaderBar(
                 content()
             }
         }
-    }
 }

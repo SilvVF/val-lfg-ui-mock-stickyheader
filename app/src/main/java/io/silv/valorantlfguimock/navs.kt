@@ -1,20 +1,16 @@
 package io.silv.valorantlfguimock
 
+import android.util.Log
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,42 +19,59 @@ import io.silv.valorantlfguimock.ui.atoms.Container
 import io.silv.valorantlfguimock.ui.components.*
 import io.silv.valorantlfguimock.ui.screens.MainScreen
 import io.silv.valorantlfguimock.ui.theme.LocalCustomColors
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun Home(paddingValues: PaddingValues) {
 
-    val lazyListJobScope = rememberCoroutineScope()
-    val lazyListState = rememberLazyListState()
-    val lazyListScrollingUp = lazyListState.isScrollingUp()
+    val scrollState = rememberScrollState()
     val navController = rememberNavController()
     val items by remember {
         mutableStateOf(NOTES)
     }
-    var showHeaderBar by remember {
-        mutableStateOf(true)
+
+    val ANCHOR_INIT = 0f
+    val (headerBarHeight, setHeaderBarHeight) = remember { mutableStateOf(50f) }
+    val minY = -headerBarHeight
+    val maxY = 40f
+    val anchorY = remember {
+        mutableStateOf(ANCHOR_INIT)
     }
-    var showHeaderBarJob: Job? by remember {
-        mutableStateOf(null)
+    var translationY by remember {
+        mutableStateOf(0f)
+    }
+    var progressY by remember {
+        mutableStateOf(0f)
     }
 
-    LaunchedEffect(key1 = lazyListScrollingUp) {
-        showHeaderBarJob?.cancel()
-        if (lazyListScrollingUp) {
-            showHeaderBarJob = lazyListJobScope.launch {
-                delay(100)
-                showHeaderBar = true
-            }
+
+    val interaction = scrollState.interactionSource.interactions.collectAsState(DragInteraction.Stop(DragInteraction.Start()))
+    if (interaction.value is DragInteraction.Stop || interaction.value is DragInteraction.Cancel) {
+        if(progressY > 0.5f || scrollState.value.toFloat() < headerBarHeight) {
+            Log.d("bar progY", "herer")
+            translationY = animateFloatAsState(
+                targetValue = maxY,
+                animationSpec = tween(delayMillis = 10000,easing = LinearOutSlowInEasing)
+            ).value
         } else {
-            showHeaderBarJob = lazyListJobScope.launch {
-                delay(300)
-                showHeaderBar = false
-            }
+            Log.d("bar progY", "hesdfasdfrer")
+            translationY = animateFloatAsState(
+                targetValue = minY,
+                animationSpec = tween(delayMillis = 10000,easing = LinearOutSlowInEasing)
+            ).value
         }
     }
+    LaunchedEffect(key1 = scrollState.value) {
+        val offsetY = scrollState.value.toFloat()
+        var distY = offsetY - anchorY.value
+        if (anchorY.value == ANCHOR_INIT) distY = offsetY
+        val value = if (offsetY <= -40f) maxY else maxOf(minY, minOf(maxY, translationY - distY))
+        translationY = value
+        anchorY.value = offsetY
+        progressY = lerp(minY.dp, maxY.dp, translationY).value
+        Log.d("bar ProgressY", translationY.toString())
+    }
+
     ModalDrawer(
         drawerContent = {
             Sidebar(SideBarContentProps(paddingValues = paddingValues))
@@ -68,10 +81,17 @@ fun Home(paddingValues: PaddingValues) {
         Container(Modifier.fillMaxSize(), Alignment.Center) {
             NavHost(navController = navController, startDestination = "MainScreen") {
                 composable("MainScreen") {
-                    Scaffold {
+                    Scaffold { paddingValues ->
                         Box(Modifier.fillMaxSize()) {
-                            MainScreen(it, lazyListState, items)
-                            HeaderBar(paddingValues = paddingValues, visible = showHeaderBar)
+                            MainScreen(
+                                paddingValues = paddingValues,
+                                scrollState = scrollState,
+                                items = items,
+                            )
+                            HeaderBar(
+                                paddingValues = paddingValues,
+                                offset = translationY
+                            )
                         }
                     }
                 }

@@ -42,6 +42,7 @@ fun ThemeSelector(
     val interactionSource = remember {
         MutableInteractionSource()
     }
+
     LaunchedEffect(key1 = selected) {
         if (selected) {
             backgroundSize.animateTo(0.8f)

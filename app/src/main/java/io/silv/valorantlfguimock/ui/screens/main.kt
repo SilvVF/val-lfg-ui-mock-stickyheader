@@ -1,6 +1,7 @@
 package io.silv.valorantlfguimock.ui.screens
 
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -13,12 +14,12 @@ import io.silv.valorantlfguimock.ui.components.NoteList
 @Composable
 fun MainScreen(
     paddingValues: PaddingValues,
-    listState: LazyListState,
+    scrollState: ScrollState,
     items: List<Note> = NOTES
 ) {
     Container(
         contentAlignment = Alignment.Center
     ) {
-        NoteList(lazyListState = listState, items = items)
+        NoteList(scrollState = scrollState, items = items)
     }
 }
