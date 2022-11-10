@@ -11,7 +11,8 @@ import io.silv.valorantlfguimock.Note
 import io.silv.valorantlfguimock.fixtures.NOTES
 
 
-@OptIn(ExperimentalFoundationApi::class)
+
+
 @Composable
 fun NoteList(
     modifier: Modifier = Modifier,
