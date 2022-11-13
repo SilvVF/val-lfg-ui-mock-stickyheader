@@ -1,0 +1,45 @@
+{
+  ConstraintSets: {
+    start: {
+      title_text: {
+        width: 'spread',
+        height: 40,
+        start: ['parent', 'start', 8],
+        top: ['parent', 'top', 8],
+        custom: {
+          fontSize: 18
+        }
+      },
+      description_text: {
+        width: 'spread',
+        height: 10,
+        top: ['title_text', 'bottom', 4],
+        start: ['parent', 'start', 4],
+      }
+    },
+    end: {
+      title_text: {
+        width: 'spread',
+        height: 60,
+        start: ['parent', 'start', 16],
+        top: ['parent', 'top', 8],
+        custom: {
+          fontSize: 32
+        },
+        description_text: {
+          width: 0,
+          height: 0,
+          top: ['title_text', 'bottom', 4],
+          start: ['parent', 'start', 4],
+        }
+      }
+    },
+    Transitions: {
+      default: {
+        from: 'start',
+        to: 'end',
+        pathMotionArc: 'startHorizontal',
+      },
+    }
+  }
+}

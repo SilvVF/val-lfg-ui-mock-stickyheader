@@ -44,17 +44,13 @@ fun Home(paddingValues: PaddingValues) {
         Container(Modifier.fillMaxSize(), Alignment.Center) {
             NavHost(navController = navController, startDestination = "MainScreen") {
                 composable("MainScreen") {
-                    Scaffold {paddingValues ->
-
+                    Scaffold { paddingValues ->
                         StickyHeaderColumn(
                             headerBar = {
                                HeaderBar()
                             },
                             modifier = Modifier
-                                .fillMaxSize(),
-                            scrollStateListener = { scrollState ->
-
-                            }
+                                .fillMaxSize().background(LocalCustomColors.current.background),
                         ) {
                             items.forEach {
                                 NoteListItem(note = it)
@@ -72,13 +68,12 @@ fun Home(paddingValues: PaddingValues) {
 @Composable
 fun StickyHeaderColumn(
     modifier: Modifier = Modifier,
-    headerBarHeight: Float = 50f,
-    scrollStateListener: (ScrollState) -> Unit = { },
+    headerBarHeight: Float = 60f,
+    scrollState: ScrollState = rememberScrollState(),
     animationSpec: AnimationSpec<Float> = SpringSpec(),
     headerBar: @Composable BoxScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
 
     val ANCHOR_INIT = -10f
@@ -101,7 +96,7 @@ fun StickyHeaderColumn(
         }
     }
 
-    LaunchedEffect(key1 = scrollState.value) {
+    LaunchedEffect(scrollState.value) {
         val offsetY = scrollState.value.toFloat()
         var distY = offsetY - anchorY
         if (anchorY== ANCHOR_INIT) distY = offsetY
@@ -111,9 +106,6 @@ fun StickyHeaderColumn(
         progressY = lerp(minY.dp, maxY.dp, translationY.value).value
     }
 
-    LaunchedEffect(key1 = scrollState) {
-        scrollStateListener(scrollState)
-    }
 
     Box(
         modifier = modifier,
@@ -147,7 +139,7 @@ fun HeaderBar() {
             )
             .padding(1.dp)
             .height(50.dp)
-            .fillMaxWidth(0.8f)
+            .fillMaxWidth(0.9f)
             .clip(RoundedCornerShape(40.dp))
             .background(colors.headerBarBackground),
         contentAlignment = Alignment.Center
